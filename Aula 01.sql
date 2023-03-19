@@ -136,3 +136,6 @@ SELECT LENGTH(nome), nome FROM cursos;
 
 -- Criar coluna na tabela de alunos para armazenar a data de nascimento
 ALTER TABLE alunos ADD COLUMN data_nascimento DATE;
+
+-- Consultar a data de nascimento dos alunos
+SELECT id, nome, data_nascimento FROM alunos;
