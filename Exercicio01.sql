@@ -22,3 +22,4 @@
 -- Consultar soma total dos valores dos produtos(quanitdade multiplicando preço unitário)
 -- Consultar os produtos da categoria bebidas ordenando pela menor quantidade
 -- Consutlar os produtos de categoria frutas e preço unitário maior que R$ 10,00
+-- LINK MIRO: https://miro.com/app/board/uXjVMeHZLE0=/?share_link_id=821951056661
