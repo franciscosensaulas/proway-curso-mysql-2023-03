@@ -463,3 +463,126 @@ INSERT INTO professores (nome, valor_hora, cpf) VALUE ('Joana', 197.50, '474.368
 
 -- Apagar a constraint de unique
 ALTER TABLE professores DROP CONSTRAINT UniqueProfessoresCpf;
+
+
+-- Consultar o nome dos produtos do mercado uma única vez, ou seja, o nome n se repetirá na consulta
+SELECT DISTINCT TRIM(nome) FROM mercadorias_do_mercado ORDER BY TRIM(nome);
+
+TRUNCATE TABLE mercadorias_do_mercado;
+ALTER TABLE mercadorias_do_mercado RENAME TO mercadorias;
+
+ALTER TABLE mercadorias DROP COLUMN data_vencimento;
+ALTER TABLE mercadorias ADD COLUMN categoria VARCHAR(25);
+
+ALTER TABLE mercadorias ADD COLUMN corredor INT;
+TRUNCATE TABLE mercadorias;
+INSERT INTO mercadorias (nome, estoque, preco_unitario, categoria, corredor) VALUES
+("Qboa", 19, 4.79, "Limpeza", 4),
+("Ovo", 30, 0.83, "Derivados", 1),
+("Suco de uva", 100, 17.00, "Bebida", 2),
+("Queijo Colonial", 2, 30.00, "Derivados", 1),
+("Calabresa com macarrão", 3, 15.00, "PF", 3),
+("Arroz", 3, 13.99, "Grãos", 3),
+("Pão Sírio", 1, 14.99, "Pão", 2),
+("Lasanha com Z", 1, 12.99, "PF", 3),
+("Baguete", 3, 5.99, "Pão", 2),
+("Monster", 6, 8.50, "Bebida", 2),
+("Ajax", 6, 10.99, "Limpeza", 4),
+("Alcatra com feijão/arroz", 1, 72.00, "PF", 3),
+("Vinho", 3, 13.00, "Bebida", 2);
+
+SELECT * FROM mercadorias;
+
+-- Consultar a soma dos produtos unitários por categoria
+SELECT 
+    categoria AS "Categoria",
+    SUM(preco_unitario) AS "Total dos preços unitários"
+    FROM mercadorias
+    GROUP BY categoria
+    ORDER BY categoria;
+
+-- Consultar o menor valor dos produtos unitários por categoria
+
+SELECT 
+    categoria AS "Categoria",
+    MIN(preco_unitario)
+    FROM mercadorias
+    GROUP BY categoria;
+
+SELECT * FROM mercadorias;
+
+-- Consultar o preço total por produto em estoque
+SELECT nome, categoria, preco_unitario * estoque "Preço total" FROM mercadorias ORDER BY categoria;
+-- Consultar a soma dos produtos por categoria;
+SELECT
+    categoria,
+    SUM(preco_unitario * estoque)
+    FROM mercadorias
+    GROUP BY categoria;
+
+
+
+SELECT * FROM mercadorias
+    ORDER BY corredor, categoria;
+
+-- Consultar as categorias com respectivo total do corredor 2 e 3 
+SELECT 
+    categoria,
+    SUM(preco_unitario * estoque)
+    FROM mercadorias
+    WHERE corredor IN(2, 3)
+    GROUP BY categoria
+    HAVING SUM(preco_unitario * estoque) > 100;
+
+-- Consultar por categoria quantos registros estão cadastrados
+SELECT
+    categoria,
+    COUNT(*)
+    FROM mercadorias
+    GROUP BY categoria;
+
+SELECT
+    CONCAT(categoria, '(', COUNT(*), ')')
+    FROM mercadorias
+    GROUP BY categoria;
+
+SELECT
+    nome,
+    categoria,
+    preco_unitario * estoque
+    FROM mercadorias;
+
+
+CREATE VIEW ListaMercadorias AS
+    SELECT
+        nome,
+        categoria,
+        preco_unitario * estoque
+        FROM mercadorias;
+
+SELECT * FROM ListaMercadorias;
+
+CREATE VIEW CursosProfessoresView AS
+    SELECT
+        cursos.nome AS "Curso",
+        professores.nome AS "Professor",
+        cursos.carga_horaria AS "Carga Horária",
+        turmas.data_inicio AS "Data Inicio",
+        turmas.data_termino AS "Data Término"
+        FROM cursos
+        INNER JOIN turmas ON(cursos.id = turmas.id_curso)
+        INNER JOIN professores ON(professores.id = turmas.id_professor);
+
+-- Gerar JSON com as propriedades do nome e estoque
+SELECT CONCAT("{""nome"": """, nome, """, ""estoque"":", estoque, "}") FROM mercadorias;
+-- Gerar JSON com as propriedades utilizando função do MYSQL
+SELECT JSON_OBJECT("produto", nome, "quantidade", estoque) FROM mercadorias;
+-- Gerar Lista de objetos (produtos) utilizando função do MYSQL
+SELECT 
+    JSON_ARRAYAGG(
+        JSON_OBJECT(
+            "produto", nome,
+            "quantidade", estoque
+        )
+    ) AS "produtos"
+    FROM mercadorias;
