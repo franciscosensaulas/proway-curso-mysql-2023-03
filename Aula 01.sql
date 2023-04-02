@@ -586,3 +586,64 @@ SELECT
         )
     ) AS "produtos"
     FROM mercadorias;
+
+-- Procedure é um pedaço de código que executa determinada rotina
+-- Criado uma procedure para concatenar o nome e sobrenome, apresentando para o usuário
+DROP PROCEDURE  IF EXISTS ConcatenarNomeCompleto;
+DELIMITER $
+CREATE PROCEDURE ConcatenarNomeCompleto(IN nome VARCHAR(30), IN sobrenome VARCHAR(60))
+    BEGIN
+        DECLARE nome_completo VARCHAR(91);
+        SET nome_completo := CONCAT(nome, " ", sobrenome);
+        SELECT nome_completo;
+    END $
+DELIMITER ;
+
+CALL ConcatenarNomeCompleto("Francisco", "Lucas Sens");
+
+-- Criar procedure para verificar a geração de acordo com a data nascimento
+DROP PROCEDURE IF EXISTS VerificarGeracaoProcedure;
+DELIMITER $
+CREATE PROCEDURE VerificarGeracaoProcedure(IN data_nascimento DATE)
+BEGIN
+    DECLARE geracao VARCHAR(30);
+    DECLARE ano INT;
+    SET ano := YEAR(data_nascimento);
+    
+    IF ano >= 1940 AND ano <= 1960 THEN
+        SET geracao := "Baby boomers";
+    ELSEIF ano <= 1980 THEN
+        SET geracao := "Geração X";
+    ELSEIF ano <= 1997 THEN
+        SET geracao := "Geração Y";
+    ELSEIF ano <= 2009 THEN
+        SET geracao := "Geração Z";
+    ELSE
+        SET geracao := "Geração Alpha";
+    END IF;
+    SELECT geracao;
+END $
+DELIMITER ;
+CALL VerificarGeracaoProcedure("1955-01-01");
+CALL VerificarGeracaoProcedure("1962-01-01");
+CALL VerificarGeracaoProcedure("1982-01-01");
+CALL VerificarGeracaoProcedure("2010-01-01");
+
+
+
+DROP PROCEDURE IF EXISTS CadastrarAlunoComDataNascimento;
+DELIMITER $
+CREATE PROCEDURE CadastrarAlunoComDataNascimento(IN nome VARCHAR(30), IN data_nascimento DATE)
+BEGIN
+    DECLARE idade INT;
+    DECLARE ano_nascimento INT;
+    DECLARE ano_hoje INT;
+    SET ano_nascimento := YEAR(data_nascimento);
+    SET ano_hoje := YEAR(NOW());
+    SET idade := ano_hoje - ano_nascimento;
+    INSERT INTO alunos (nome, idade, data_nascimento) VALUES (nome, idade, data_nascimento);
+    SELECT * FROM alunos;
+END $
+DELIMITER ;
+CALL CadastrarAlunoComDataNascimento("Joana", "1994-06-04");
+CALL CadastrarAlunoComIdade("Joana", 29, 06, 04);
